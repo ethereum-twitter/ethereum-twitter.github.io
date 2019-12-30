@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Twitter</title>
+    <base href="/" />
+    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/site.css" rel="stylesheet" />
+</head>
+
+<body>
+    <app>Loading...</app>
+    <script src="css/bootstrap/bootstrap-native.min.js"></script>
+    <script type="blazor-boot">
+        </script>
+<script>
+    window.addEventListener('load', async () => {
+        // Modern dapp browsers...
+        if (window.ethereum) {
+            window.web3 = new Web3(ethereum);
+            try {
+                // Request account access if needed
+                await ethereum.enable();
+                // Acccounts now exposed
+                Blazor.registerFunction('sendTransaction', sendTransaction);
+                Blazor.registerFunction('getAccount', getAccount);
+            } catch (error) {
+                // User denied account access...
+            }
+        }
+        // Legacy dapp browsers...
+        else if (window.web3) {
+            window.web3 = new Web3(web3.currentProvider);
+            // Acccounts always exposed
+            Blazor.registerFunction('sendTransaction', sendTransaction);
+            Blazor.registerFunction('getAccount', getAccount);
+        }
+        // Non-dapp browsers...
+        else {
+            alert('Please install Metamask to post tweets');
+        }
+    });
+    function getAccount() {
+        return web3.eth.accounts[0];
+    }
+    //we should pass the gas price, gas cost, value etc.. here too.
+    function sendTransaction(to, data) {
+        var from = web3.eth.accounts[0];
+        if ((typeof (to) !== 'undefined') && (to !== null)) {
+            web3.eth.sendTransaction({ from: from, to: to, data: data }, function (error, hash) {
+                if (error) {
+                    console.log(error);
+                }
+                else {
+                    console.log(hash);
+                }
+            });
+        } else {
+            web3.eth.sendTransaction({ from: from, data: data }, function (error, hash) {
+                if (error) {
+                    console.log(error);
+                }
+                else {
+                    console.log(hash);
+                }
+            });
+        }
+    }
+</script>
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+    <script src="_framework/blazor.webassembly.js"></script>
+</body>
+
+</html>
